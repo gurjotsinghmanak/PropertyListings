@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  propertylistingsapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    networks:
+      - property-network
+
+networks:
+  property-network:
+    driver: bridge
