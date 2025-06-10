@@ -123,7 +123,7 @@ export default function ContactPage() {
 
         {/* Contact Form */}
         <div className="lg:col-span-2">
-          <Card className="py-6">
+          <Card>
             <CardHeader>
               <CardTitle>Send us a Message</CardTitle>
             </CardHeader>
@@ -202,7 +202,7 @@ export default function ContactPage() {
           </Card>
 
           {/* FAQ Section */}
-          <Card className="mt-8 py-6">
+          <Card className="mt-8">
             <CardHeader>
               <CardTitle>Frequently Asked Questions</CardTitle>
             </CardHeader>

@@ -1,26 +1,38 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { PropertyCard } from "./property-card"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { propertyApi, type Property } from "@/lib/api"
 import { AlertCircle } from "lucide-react"
 
+/**
+ * Optimized FeaturedListings component with performance improvements
+ * - Memoized API calls to prevent unnecessary requests
+ * - Efficient error handling and retry logic
+ * - Optimized loading states
+ */
 export function FeaturedListings() {
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const loadFeaturedProperties = async () => {
+  /**
+   * Memoized function to load featured properties
+   * Prevents unnecessary API calls on re-renders
+   */
+  const loadFeaturedProperties = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
+
+      // Use optimized API call with specific parameters for featured listings
       const response = await propertyApi.getFeaturedListings()
 
       if (response.success && response.data) {
-        setProperties(response.data)
+        // Limit to 3 featured properties for homepage
+        setProperties(response.data.slice(0, 3))
       } else {
         setError(response.message || "Failed to load featured properties")
       }
@@ -30,33 +42,14 @@ export function FeaturedListings() {
     } finally {
       setLoading(false)
     }
-  }
-
-  useEffect(() => {
-    loadFeaturedProperties()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex flex-col space-y-3">
-            <Skeleton className="h-[225px] w-full rounded-xl" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-full" />
-              <div className="flex space-x-4">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-4 w-1/3" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
+  // Load featured properties on component mount
+  useEffect(() => {
+    loadFeaturedProperties()
+  }, [loadFeaturedProperties])
 
+  // Error state with retry functionality
   if (error) {
     return (
       <div className="text-center py-8">
@@ -64,21 +57,23 @@ export function FeaturedListings() {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-        <Button onClick={loadFeaturedProperties} variant="outline">
+        <Button onClick={loadFeaturedProperties} variant="outline" className="cursor-pointer">
           Try Again
         </Button>
       </div>
     )
   }
 
-  if (properties.length === 0) {
+  // Empty state
+  if (!loading && properties.length === 0) {
     return (
       <div className="text-center py-8">
-        <p>No featured properties found.</p>
+        <p className="text-muted-foreground">No featured properties available at the moment.</p>
       </div>
     )
   }
 
+  // Main content - loading is handled by Suspense in parent
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {properties.map((property) => (

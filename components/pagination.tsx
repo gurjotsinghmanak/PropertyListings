@@ -42,7 +42,23 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
           const page = i + 1
           const isCurrentPage = page === currentPage
 
-          // Show limited page numbers for better UX
+          // If 5 or fewer pages, show all pages
+          if (totalPages <= 5) {
+            return (
+              <Button
+                key={page}
+                variant={isCurrentPage ? "default" : "outline"}
+                size="icon"
+                onClick={() => handlePageChange(page)}
+                className={`w-9 h-9 ${isCurrentPage ? "" : "cursor-pointer"}`}
+                disabled={isCurrentPage}
+              >
+                {page}
+              </Button>
+            )
+          }
+
+          // For more than 5 pages, show limited page numbers with ellipsis
           if (page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
             return (
               <Button
@@ -58,7 +74,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
             )
           }
 
-          // Show ellipsis for skipped pages
+          // Show ellipsis for skipped pages (only when more than 5 pages)
           if (page === currentPage - 2 || page === currentPage + 2) {
             return (
               <span key={page} className="px-2">

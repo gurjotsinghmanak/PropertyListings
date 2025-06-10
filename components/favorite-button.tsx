@@ -28,7 +28,7 @@ export function FavoriteButton({ propertyId, className, size = "default" }: Favo
       variant="ghost"
       size={size === "sm" ? "icon" : "icon"}
       onClick={handleClick}
-      className={cn("hover:bg-background/80 transition-colors", size === "sm" && "h-8 w-8", className)}
+      className={cn("hover:bg-background/80 transition-colors cursor-pointer", size === "sm" && "h-8 w-8", className)}
       aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
     >
       <Heart
